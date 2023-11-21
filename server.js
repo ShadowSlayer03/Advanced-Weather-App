@@ -2,6 +2,7 @@ require('dotenv').config();
 let express = require('express');
 let bodyParser = require('body-parser');
 const { getJson } = require("serpapi");
+const fetch = require('node-fetch');
 const axios = require('axios');
 const port = 3000;
 
@@ -38,6 +39,9 @@ app.set('view engine', 'ejs');
     {
       console.log("No address found");
     }
+  })
+  .catch(error =>{
+    console.log("Error occurred: ",error);
   })
  });
 
