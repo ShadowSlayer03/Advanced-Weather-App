@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./images/weather-app-favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css" integrity="sha512-HXXR0l2yMwHDrDyxJbrMD9eLvPe3z3qL3PPeozNTsiHJEENxx8DH2CxmV05iwG0dwoz5n4gQZQyYLUNt1Wdgfg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="./styles.css">
+    <title>Weather App</title>
+</head>
+<body>
+    <div id="main">
+        <div id="weather-panel">
+            <div id="left">
+
+                <div id="search">
+                    <i class="ri-search-2-line search-icon" id="search-icon"></i>
+                    <input placeholder="Search for places ..." id="search-input"></input>
+                    <i class="ri-map-pin-line location-icon" id="get-location"></i>
+                </div>
+
+                <div id="main-weather-info">
+                    <img src="./images/<%= weatherCode %>_<%= is_day?"day":"night"%>.png" alt="" id="current-weather-img">
+                    <% if (unit=="c") { %>
+                        <div id="current-temp"><%=temp_c%><span>°C</span></div>
+                    <% } else if(unit=="f") { %>
+                        <div id="current-temp"><%=temp_f%><span>°F</span></div>
+                    <% } %>
+                    <div id="current-day"><%= day %>, 
+                        <% if(Number(time.split(":")[0])<10) {
+                                time = "0"+time;
+                            }                       
+                        %>
+                        <span id="current-day-span"> <%= time %> </span>
+                    </div>
+                </div>
+                
+                <div id="extra-weather-details">
+                    <div id="weather-spec">
+                        <img src="./images/1006_day.png" alt="cloud">
+                        <h5>Clouds - <%=cloudPercent%>%</h5>
+                    </div>
+                    
+                    <div id="chances-of-rain">
+                        <img src="./images/1243_day.png" alt="rainfall">
+                        <h5>Rains - <%= rain %>%</h5>
+                    </div>
+                </div>
+
+                <div id="place">
+                    <img src="<%= imgUrl %>" alt="<%= loc %>" />
+                    <h4><%= loc %></h4>
+                </div>
+            </div>
+
+
+            <div id="right">
+                <nav>
+                    <div id="toggle-forecast">
+                        <h2>Today</h2>
+                        <h2 class="active">Week</h2>
+                    </div>
+                    
+                    <div id="toggle-units">
+                        <% if(unit=="c") { %>
+                        <h2 class="active">°C</h2>
+                        <h2>°F</h2>
+                        <% } else if(unit=="f") { %>
+                            <h2>°C</h2>
+                            <h2 class="active">°F</h2>
+                        <% } %>
+                    </div>
+                </nav>
+
+                <!-- WEEKLY FORECAST PALETTE -->
+                <div id="forecast-palette-week">
+                    <%
+                    let dayArr = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+                    let dayIndex = [0];
+                    for(let i=1;i<=7;i++)
+                    {
+                        let date = new Date(daysInfo[i].date);
+                        let reqDayVal = date.getDay(); %>
+
+                        <div class="weekly-weather">
+                        <h2 id="day-name"><%= dayArr[reqDayVal] %></h2>
+                        <img src="./images/<%= daysInfo[i].hour[12].condition.code %>_day.png" alt="weather1">
+                        <div class="temperature">
+                            <% if (unit=="c") { %>
+                                <h2 id="max-temp1" class="max-temp"><%= daysInfo[i].day.maxtemp_c %>°</h2>
+                                <h2 id="min-temp1" class="min-temp"><%= daysInfo[i].day.mintemp_c %>°</h2>
+                            <% } else if(unit=="f") { %>
+                                <h2 id="max-temp1" class="max-temp"><%= daysInfo[i].day.maxtemp_f %>°</h2>
+                                <h2 id="min-temp1" class="min-temp"><%= daysInfo[i].day.mintemp_f %>°</h2>
+                            <% } %>
+                            
+                        </div>
+                        </div>
+
+                    <% } %>
+                </div>
+
+                <!-- TODAY'S FORECAST PALETTE -->
+                <div id="forecast-palette-today">
+                    <%
+                        let timeinInt = Number.parseInt(time.split(":")[0])
+                        let j=0,i=0,reps=0,times;
+                        while(reps<8)
+                        {
+                            if(j>=1)
+                            {
+                                times = daysInfo[j].hour[i].time.split(' ')[1]; %>
+                            <div class="weekly-weather">
+                                <h2 id="day-name"><%= times %></h2>
+                                <img src="./images/<%= daysInfo[j].hour[i].condition.code %>_day.png" alt="day-weather">
+                                <div class="temperature">
+                                    <% if (unit=="c") { %>
+                                        <h2 id="max-temp2" class="max-temp"><%= daysInfo[j].hour[i].temp_c %>°</h2>
+                            <% } else if(unit=="f") { %>
+                                        <h2 id="max-temp2" class="max-temp"><%= daysInfo[j].hour[i].temp_f %>°</h2>
+                            <% } %>
+                                </div>
+                            </div>
+                        <%   console.log("i: ", i); reps++; i++;   }
+                            else{
+                            for(i=timeinInt+1;i<timeinInt+9;i++)
+                            { 
+                                if(i==24)
+                                {
+                                    i=0;
+                                    j++;
+                                    break;
+                                }
+                                times = daysInfo[j].hour[i].time.split(' ')[1];  
+                                console.log(times) %>
+
+                            <div class="weekly-weather">
+                                <h2 id="day-name"><%= times %></h2>
+                                <img src="./images/<%= daysInfo[j].hour[i].condition.code %>_day.png" alt="day-weather">
+                                <div class="temperature">
+                                    <% if (unit=="c") { %>
+                                        <h2 id="max-temp2" class="max-temp"><%= daysInfo[j].hour[i].temp_c %>°</h2>
+                                    <% }else if(unit=="f") { %>
+                                        <h2 id="max-temp2" class="max-temp"><%= daysInfo[j].hour[i].temp_f %>°</h2>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <% reps++;}}} %>                                
+                </div>
+
+                <div id="highlights">
+                    <h1>Today's Highlights</h1>
+                    <div id="weather-details-current-day">
+
+                        <div class="uv-index">
+                            <h2>UV Index</h2>
+                            <div class="uv-index-info">
+                                <img src="./images/uv-index.png" alt="uv-index">
+                                <h3><%= uv %></h3>
+                            </div>
+                        </div>
+
+                        <div class="wind-status">
+                            <h2>Wind Status</h2>
+                            <h3><%= windKPH %><span> km/h</span></h3>
+                            <div id="speed-direction">
+                                <i class="ri-compass-discover-line"></i>
+                                <h4><%= windDir %></h4>
+                            </div>
+                        </div>
+
+                        <div class="sunrise-sunset">
+                            <h2 id="highlight-name">Sunrise & Sunset</h2>
+                            <div id="sunrise">
+                                <img src="./images/Sunrise.png" alt="sunrise">
+                                <div id="sunrise-text">
+                                    <h4><%= sunrise %></h4>
+                                </div>
+                            </div>
+
+
+                            <div id="sunset">
+                                <img src="./images/Sunset.png" alt="sunset">
+                                <div id="sunset-text">
+                                    <h4><%= sunset %></h4>                                
+                                </div>
+                            </div>
+                            </div>
+                        
+
+                        <div class="humidity">
+                            <h2 id="highlight-name">Humidity</h2>
+                            <div id="humidity-inner-content">
+                                <div id="humidity-text">
+                                    <h3><%=humid%><span> %</span></h3>
+                                    <% 
+                                    const humidityRanges = [
+                                        { min: 0, max: 20, rating: "Very Low", emoji: "🤧" },
+                                        { min: 21, max: 40, rating: "Low", emoji: "👎" },
+                                        { min: 41, max: 80, rating: "Normal", emoji: "👍" },
+                                        { min: 81, max: 100, rating: "Very High", emoji: "🥵"  }
+                                    ];
+                                
+                                    let H_emo,H_rating;    
+                                    for( let i = 0; i < humidityRanges.length; i++ ) {
+                                        if(humid>=humidityRanges[i].min && humid<=humidityRanges[i].max)
+                                        {
+                                            H_rating = humidityRanges[i].rating;
+                                            H_emo = humidityRanges[i].emoji;
+                                        }
+                                    }                            
+                                    %>
+                                    <h4><%= H_rating %> <%= H_emo %></h4>
+                                </div>
+                                <%  
+                                    let barUrl;
+                                    if(humid==0)
+                                    {
+                                        barUrl = "./images/0.png"
+                                    }
+                                    else if(1<=humid && humid<=20)
+                                    {
+                                        barUrl = "./images/10-20.png"
+                                    }
+                                    else if(21<=humid && humid<=30)
+                                    {
+                                        barUrl = "./images/20-30.png"
+                                    }
+                                    else if(31<=humid && humid<50)
+                                    {
+                                        barUrl = "./images/30-40.png"
+                                    }
+                                    else if(humid==50)
+                                    {
+                                        barUrl = "./images/50.png"
+                                    }
+                                    else if(51<=humid && humid<=70)
+                                    {
+                                        barUrl = "./images/60-70.png"
+                                    }
+                                    else if(71<=humid && humid<=80)
+                                    {
+                                        barUrl = "./images/60-70.png"
+                                    }
+                                    else if(81<=humid && humid<100)
+                                    {
+                                        barUrl = "./images/80-90.png"
+                                    }
+                                    else if(humid==100)
+                                    {
+                                        barUrl = "./images/100.png"
+                                    }
+                                    //console.log("barurl:",barUrl);
+                                %>
+                                <img src="<%= barUrl %>" alt="bar-showing-level">
+                            </div>
+                        </div>
+
+                        <div class="visibility">
+                            <h2>Visibility</h2>
+                            <div id="visibility-inner-content">
+                                <div id="visibility-text">
+                                    <h3><%= visibility %><span> km</span></h3>
+                                    <% 
+                                    const visibilityRanges = [
+                                        { min: 10, max: 20, rating: "V Good", emoji: "💯" },
+                                        { min: 5, max: 9, rating: "Good", emoji: "👍" },
+                                        { min: 2, max: 4, rating: "Average", emoji: "🆗" },
+                                        { min: 0, max: 1, rating: "Poor", emoji: "👎"  }
+                                    ];
+                                
+                                    let V_emo,V_rating;    
+                                    for( let i = 0; i < visibilityRanges.length; i++ ) {
+                                        if(visibility>=visibilityRanges[i].min && visibility<=visibilityRanges[i].max)
+                                        {
+                                            V_rating = visibilityRanges[i].rating;
+                                            V_emo = visibilityRanges[i].emoji;
+                                        }
+                                    }                            
+                                    %>
+                                    <h4><%= V_rating %> <%= V_emo %></h4>
+                                </div>
+                                <img src="./images/visibility.png" alt="visibility">
+                            </div>
+                        </div>
+
+                        <div class="air-quality">
+                            <h2>Air Pollution Index</h2>
+                            <div id="air-quality-inner-content">
+                                <div id="air-quality-text">
+                                    <h3><%= AQI %></h3>
+                                    <%
+                                        const airQualityRanges = [
+                                        { value: 1, rating: "V Good", emoji: "👍" },
+                                        { value: 2, rating: "Good", emoji: "🆗" },
+                                        { value: 3, rating: "Moderate", emoji: "🆗" },
+                                        { value: 4, rating: "Unhealthy", emoji: "😷"  },
+                                        { value: 5, rating: "V Unhealthy", emoji: "⚠️"  },
+                                        { value: 6, rating: "Hazardous", emoji: "💀"  },
+                                    ]; 
+                                    let AQ_rating,AQ_emo;
+                                    for(let i=0;i<airQualityRanges.length;i++)
+                                    {
+                                        if(AQI==airQualityRanges[i].value)
+                                        {
+                                            AQ_rating = airQualityRanges[i].rating;
+                                            AQ_emo = airQualityRanges[i].emoji;
+                                        }
+                                    }
+                                    %>
+                                    <h4><%= AQ_rating %> <%= AQ_emo %></h4>
+                                </div>
+                                <img src="./images/<%= AQI %>.png" alt="bar-showing-level">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="./script.js"></script>
+</body>
+</html>

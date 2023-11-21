@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/images/weather-app-favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css" integrity="sha512-HXXR0l2yMwHDrDyxJbrMD9eLvPe3z3qL3PPeozNTsiHJEENxx8DH2CxmV05iwG0dwoz5n4gQZQyYLUNt1Wdgfg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/homepage_styles.css">
+    <title>WeatherWiz | Accurate Weather Forecast App</title>
+</head>
+<body>
+    <div id="main">
+        <h1>WeatherWiz</h1>
+        <div id="how-to-use">
+            <ul>
+                <li>Enter a valid location to see weather details.</li>
+                <li>Click the location icon to get weather details for your current location.</li>
+            </ul>
+        </div>
+       
+        <div id="search-bar">
+                <i id="search-icon" class="ri-search-2-line search-icon"></i>
+                <input id="search-input" placeholder="Search for places ..."></input>
+                <i class="ri-map-pin-line location-icon" id="get-location"></i>
+        </div>
+    </div>
+    <script>
+        // Get the DOM elements
+const searchIcon = document.getElementById('search-icon');
+const searchInput = document.getElementById('search-input');
+const getLocationButton = document.getElementById('get-location');
+let inputValue=0;
+
+//Get the latitude and longitude when click on 'Location Pin' icon
+getLocationButton.addEventListener('click', () => {
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      latitude = position.coords.latitude;
+      longitude = position.coords.longitude;
+
+      console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+
+      // Sending latitude and longitude to the server
+      const data = {
+        lat: latitude,
+        long: longitude,
+      };
+
+      const url = '/location';
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+      .then((response) => {
+        console.log("Response Ok");
+        window.location.href = response.url;
+      })
+      .catch((error) => {
+        console.log("Response Not Ok", error);
+      });
+    });
+  } else {
+    alert("Geolocation is not supported by your browser.");
+  }
+});
+
+// Click the search icon to search weather
+searchIcon.addEventListener('click', () => {
+  inputValue = searchInput.value;
+  if (inputValue) 
+  {
+    const url = `/get-weather?location=${inputValue}&from=search&unit=c`;
+    window.location.href = url;
+  }
+  else
+  {
+    alert("Enter a location");
+  }    
+});
+
+// Press "Enter" on keyboard to search
+searchInput.addEventListener('keydown',(e)=>{
+  if(e.key=="Enter")
+  {
+    inputValue = searchInput.value;
+    if (inputValue) 
+    {
+      const url = `/get-weather?location=${inputValue}&from=search&unit=c`;
+      window.location.href = url;
+    }
+    else
+    {
+      alert("Enter a location");
+    }    
+  }
+});
+    </script>
+
+</body>
+</html>
