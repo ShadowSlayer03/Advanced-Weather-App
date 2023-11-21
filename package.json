@@ -2,6 +2,7 @@
   "name": "weather-app",
   "version": "1.0.0",
   "description": "A simple weather app project",
+  "type": "module",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

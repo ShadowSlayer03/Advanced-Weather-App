@@ -1,9 +1,12 @@
-require('dotenv').config();
-let express = require('express');
-let bodyParser = require('body-parser');
-const { getJson } = require("serpapi");
-const fetch = require('node-fetch');
-const axios = require('axios');
+import dotenv from 'dotenv';
+dotenv.config();
+
+import express from 'express';
+import bodyParser from 'body-parser';
+import { getJson } from 'serpapi';
+import fetch from 'node-fetch';
+import axios from 'axios';
+
 const port = 3000;
 
 var apiResultImg,location,from,latitude,longitude,currentTempC,currentTempF,cloudPercentage,isDay,weatherDesc,tempUnit;
